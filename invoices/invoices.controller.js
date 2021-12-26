@@ -51,7 +51,8 @@ function create(req, res, next) {
         },
         bankAccount: {
             _id: Joi.objectId()
-        }
+        },
+        currency: Joi.string().valid('USD','CZK','RUB'),
     });
     const {error: bodyError, value: body} = Validate.validateBody(bodySchema, req, res);
     if (bodyError) return next();
@@ -84,6 +85,7 @@ function update(req, res, next) {
         bankAccount: {
             _id: Joi.objectId()
         },
+        currency: Joi.string().valid('USD','CZK','RUB'),
         paid: Joi.boolean(),
     });
     const {error: bodyError, value: body} = Validate.validateBody(bodySchema, req, res);

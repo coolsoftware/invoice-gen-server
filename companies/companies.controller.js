@@ -43,7 +43,8 @@ function create(req, res, next) {
     const bodySchema = Joi.object({
         name: Joi.string(),
         inn: Joi.string(),
-        address: Joi.string(),
+        vat: Joi.string(),
+        address: Joi.array().items(Joi.string()),
     });
     const {error: bodyError, value: body} = Validate.validateBody(bodySchema, req, res);
     if (bodyError) return next();
@@ -61,7 +62,8 @@ function update(req, res, next) {
     const bodySchema = Joi.object({
         name: Joi.string(),
         inn: Joi.string(),
-        address: Joi.string(),
+        vat: Joi.string(),
+        address: Joi.array().items(Joi.string()),
     });
     const {error: bodyError, value: body} = Validate.validateBody(bodySchema, req, res);
     if (bodyError) return next();

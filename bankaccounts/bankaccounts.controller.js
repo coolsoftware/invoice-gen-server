@@ -37,6 +37,13 @@ function create(req, res, next) {
         accountName: Joi.string(),
         accountNumber: Joi.string(),
         bankName: Joi.string(),
+        swift: Joi.string(),
+        bankAddress: Joi.array().items(Joi.string()),
+        correspondentBank: Joi.object({
+            bankName: Joi.string(),
+            swift: Joi.string(),
+            address: Joi.array().items(Joi.string()),
+        }),
         currency: Joi.string().valid('USD','CZK','RUB'),
     });
     const {error: bodyError, value: body} = Validate.validateBody(bodySchema, req, res);
@@ -56,6 +63,13 @@ function update(req, res, next) {
         accountName: Joi.string(),
         accountNumber: Joi.string(),
         bankName: Joi.string(),
+        swift: Joi.string(),
+        bankAddress: Joi.array().items(Joi.string()),
+        correspondentBank: Joi.object({
+            bankName: Joi.string(),
+            swift: Joi.string(),
+            address: Joi.array().items(Joi.string()),
+        }),
         currency: Joi.string().valid('USD','CZK','RUB'),
     });
     const {error: bodyError, value: body} = Validate.validateBody(bodySchema, req, res);
@@ -70,6 +84,7 @@ function _delete(req, res, next) {
         id: Joi.objectId()
     });
     const {error: paramsError, value: params} = Validate.validateParams(paramSchema, req, res);
+    if (paramError) return next();
     bankAccountService.delete(params.id)
         .then(() => res.json({}))
         .catch(err => next(err));
