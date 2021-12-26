@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const bankAccountService = require('./bankaccount.service');
+const Validate = require('_helpers/validate');
+const Joi = require('joi');
+
+Joi.objectId = require('joi-objectid')(Joi)
 
 // routes
 router.get('/', getAll);
@@ -18,25 +22,55 @@ function getAll(req, res, next) {
 }
 
 function getById(req, res, next) {
-    bankAccountService.getById(req.params.id)
+    const paramSchema = Joi.object({
+        id: Joi.objectId()
+    });
+    const {error: paramError, value: params} = Validate.validateParams(paramSchema, req, res);
+    if (paramError) return next();
+    bankAccountService.getById(params.id)
         .then(account => res.json(account))
         .catch(err => next(err));
 }
 
 function create(req, res, next) {
-    bankAccountService.create(req.body)
+    const bodySchema = Joi.object({
+        accountName: Joi.string(),
+        accountNumber: Joi.string(),
+        bankName: Joi.string(),
+        currency: Joi.string().valid('USD','CZK','RUB'),
+    });
+    const {error: bodyError, value: body} = Validate.validateBody(bodySchema, req, res);
+    if (bodyError) return next();
+    bankAccountService.create(body)
         .then(account => res.json(account))
         .catch(err => next(err));
 }
 
 function update(req, res, next) {
-    bankAccountService.update(req.params.id, req.body)
+    const paramSchema = Joi.object({
+        id: Joi.objectId()
+    });
+    const {error: paramError, value: params} = Validate.validateParams(paramSchema, req, res);
+    if (paramError) return next();
+    const bodySchema = Joi.object({
+        accountName: Joi.string(),
+        accountNumber: Joi.string(),
+        bankName: Joi.string(),
+        currency: Joi.string().valid('USD','CZK','RUB'),
+    });
+    const {error: bodyError, value: body} = Validate.validateBody(bodySchema, req, res);
+    if (bodyError) return next();
+    bankAccountService.update(params.id, body)
         .then(() => res.json({}))
         .catch(err => next(err));
 }
 
 function _delete(req, res, next) {
-    bankAccountService.delete(req.params.id)
+    const paramSchema = Joi.object({
+        id: Joi.objectId()
+    });
+    const {error: paramsError, value: params} = Validate.validateParams(paramSchema, req, res);
+    bankAccountService.delete(params.id)
         .then(() => res.json({}))
         .catch(err => next(err));
 }

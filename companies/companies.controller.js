@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const companyService = require('./company.service');
+const Validate = require('_helpers/validate');
+const Joi = require('joi');
+
+Joi.objectId = require('joi-objectid')(Joi)
 
 // routes
 router.get('/', getAll);
@@ -25,25 +29,54 @@ function getDefault(req, res, next) {
 }
 
 function getById(req, res, next) {
-    companyService.getById(req.params.id)
+    const paramSchema = Joi.object({
+        id: Joi.objectId()
+    });
+    const {error: paramError, value: params} = Validate.validateParams(paramSchema, req, res);
+    if (paramError) return next();
+    companyService.getById(params.id)
         .then(company => res.json(company))
         .catch(err => next(err));
 }
 
 function create(req, res, next) {
-    companyService.create(req.body)
+    const bodySchema = Joi.object({
+        name: Joi.string(),
+        inn: Joi.string(),
+        address: Joi.string(),
+    });
+    const {error: bodyError, value: body} = Validate.validateBody(bodySchema, req, res);
+    if (bodyError) return next();
+    companyService.create(body)
         .then(company => res.json(company))
         .catch(err => next(err));
 }
 
 function update(req, res, next) {
-    companyService.update(req.params.id, req.body)
+    const paramSchema = Joi.object({
+        id: Joi.objectId()
+    });
+    const {error: paramError, value: params} = Validate.validateParams(paramSchema, req, res);
+    if (paramError) return next();
+    const bodySchema = Joi.object({
+        name: Joi.string(),
+        inn: Joi.string(),
+        address: Joi.string(),
+    });
+    const {error: bodyError, value: body} = Validate.validateBody(bodySchema, req, res);
+    if (bodyError) return next();
+    companyService.update(params.id, body)
         .then(() => res.json({}))
         .catch(err => next(err));
 }
 
 function _delete(req, res, next) {
-    companyService.delete(req.params.id)
+    const paramSchema = Joi.object({
+        id: Joi.objectId()
+    });
+    const {error: paramError, value: params} = Validate.validateParams(paramSchema, req, res);
+    if (paramError) return next();
+    companyService.delete(params.id)
         .then(() => res.json({}))
         .catch(err => next(err));
 }
